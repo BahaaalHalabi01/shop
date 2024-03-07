@@ -19,16 +19,21 @@ export async function addProduct(formData: FormData) {
   /**@todo handle error*/
   const safe = add_item_schema.parse(rawData);
 
- const db_res = await db.insert(products).values({
-    ...safe,
-    purchase_date: new Date(safe.purchase_date),
-  }).returning();
+  const db_res = await db
+    .insert(products)
+    .values({
+      purchase_date: new Date(safe.purchase_date),
+      link: safe.link ?? "",
+      image: safe.image ?? "",
+      price: safe.price,
+      stock: safe.stock,
+      name: safe.name,
+    })
+    .returning();
 
   const res = await search_client
     .index(SearchIndex.products)
     .addDocuments(db_res);
-
-  console.debug("search res", JSON.stringify(res, null, 2));
 
   revalidatePath("/");
   redirect(`/`);

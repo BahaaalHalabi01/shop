@@ -20,6 +20,7 @@ import { ChangeEvent, useRef } from "react";
 import { addProduct } from "@/server/product/actions/add";
 
 export const AddForm = () => {
+
   const form = useForm<z.infer<typeof add_item_schema>>({
     defaultValues: {
       name: "",

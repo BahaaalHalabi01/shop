@@ -15,7 +15,7 @@ function seed() {
     const items = new Array(12).fill(0).map(createTovar);
 
     let res = await db.insert(products).values(items).returning();
-    await search_client.index(SearchIndex.products).addDocuments(res);
+    // await search_client.index(SearchIndex.products).addDocuments(res);
   }
 
   void seedProducts();

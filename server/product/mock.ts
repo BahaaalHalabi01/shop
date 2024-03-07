@@ -7,5 +7,7 @@ export function createTovar(): TCreateProduct {
     name: faker.commerce.product(),
     purchase_date: faker.date.past(),
     price: Number(faker.commerce.price()),
+    image:'',
+    link:''
   };
 }
