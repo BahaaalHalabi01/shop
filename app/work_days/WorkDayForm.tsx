@@ -17,14 +17,33 @@ import { debounce } from "lodash";
 import { ChangeEvent, useCallback, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { search_product } from "@/server/product/actions/search";
-import { Loader } from "lucide-react";
+import { CheckIcon, ChevronsUpDown, Loader } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandLoading,
+} from "@/components/ui/command";
 
 type TParams = {};
 
 export default function WorkDayForm({}: TParams) {
   const schema = z.object({
-    product: z.string(),
+    product: z.object({
+      name: z.string().min(0),
+      id: z.string(),
+      price: z.number(),
+    }),
     amount: z.number(),
+    customer: z.string().optional(),
   });
 
   const [search, setSearch] = useState("");
@@ -36,18 +55,11 @@ export default function WorkDayForm({}: TParams) {
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      product: "",
-    },
   });
 
-  const onChangeSearchTerm = useCallback(
-    (event: ChangeEvent<HTMLInputElement>, onChange: any) => {
-      onChange(event);
-      debouncedSearch(event.currentTarget.value);
-    },
-    [],
-  );
+  const handleSearchChange = useCallback((value: string) => {
+    debouncedSearch(value);
+  }, []);
 
   const debouncedSearch = useCallback(
     debounce((s) => {
@@ -66,25 +78,77 @@ export default function WorkDayForm({}: TParams) {
             <FormField
               control={form.control}
               name="product"
-              render={({ field: { onChange, ...r } }) => (
-                <FormItem>
-                  <FormLabel>Product Id</FormLabel>
-                  <div className="flex relative">
-                    <FormControl>
-                      <Input
-                        className="pr-8"
-                        placeholder="240"
-                        {...r}
-                        onChange={(e) => onChangeSearchTerm(e, onChange)}
-                      />
-                    </FormControl>
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Product Id*</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "w-[200px] justify-between",
+                            !field.value && "text-muted-foreground",
+                          )}
+                        >
+                          {field.value.name
+                            ? field.value.name + ` (${field.value.price}$)`
+                            : "Select Product"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[200px] p-0">
+                      <Command shouldFilter={false}>
+                        <CommandInput
+                          onValueChange={handleSearchChange}
+                          placeholder="Search for product..."
+                          className="h-9"
+                        />
+                        {!isLoading && (
+                          <CommandEmpty>No products found</CommandEmpty>
+                        )}
 
-                    <div className="absolute flex right-2 -translate-y-1/2 top-1/2">
-                      {isLoading && (
-                        <Loader className="animate-spin text-white inline-flex" />
-                      )}
-                    </div>
-                  </div>
+                        <CommandList>
+                          {isLoading && (
+                            <CommandLoading>
+                              <div className="flex items-center justify-between flex-row p-3">
+                                <p className="inline-flex">Loading...</p>
+                                <Loader className="animate-spin text-white inline-flex" />
+                              </div>
+                            </CommandLoading>
+                          )}
+                          {data &&
+                            !isLoading &&
+                            data.map((product) => (
+                              <CommandItem
+                                value={product.id + ""}
+                                key={product.id}
+                                onSelect={(v) =>
+                                  field.onChange({
+                                    name: product.name,
+                                    id: v,
+                                    price: product.price,
+                                  })
+                                }
+                              >
+                                {product.name} ({product.price}$)
+                                <CheckIcon
+                                  className={cn(
+                                    "ml-auto h-4 w-4",
+                                    product.id + "" === field.value.id
+                                      ? "opacity-100"
+                                      : "opacity-0",
+                                  )}
+                                />
+                              </CommandItem>
+                            ))}
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+
                   <FormDescription>
                     The product id that was sold
                   </FormDescription>
@@ -96,8 +160,8 @@ export default function WorkDayForm({}: TParams) {
               control={form.control}
               name="amount"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Number of Items</FormLabel>
+                <FormItem className="max-w-fit">
+                  <FormLabel>Number of Items*</FormLabel>
                   <FormControl>
                     <Input placeholder="20" type="number" {...field} />
                   </FormControl>
@@ -106,14 +170,26 @@ export default function WorkDayForm({}: TParams) {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="customer"
+              render={({ field }) => (
+                <FormItem className="max-w-fit">
+                  <FormLabel>Name of the customer</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Bahaa" type="text" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Enter the name of customer if needed
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
           <Button type="submit">Submit</Button>
         </form>
       </Form>
-      <div className="pt-8">
-        {" "}
-        {data?.map((i) => <div key={i.id}>{i.name}</div>)}
-      </div>
     </div>
   );
 }

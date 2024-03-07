@@ -11,6 +11,3 @@ export const add_item_schema = z.object({
 
 export type TCreateProduct = z.infer<typeof add_item_schema>;
 
-export type TProduct = TCreateProduct & {
-  id: number;
-};

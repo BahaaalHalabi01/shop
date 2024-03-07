@@ -1,4 +1,4 @@
-import { TProduct } from "@/server/product/schema";
+import { TProduct } from "@/lib/db_schema";
 import { format } from "date-fns";
 import Image from "next/image";
 
@@ -14,8 +14,8 @@ export default function ShopItem({
   return (
     <div className="rounded-lg flex gap-x-2 text-lg">
       <Image
-        unoptimized={image.length === 0}
-        src={image.length > 0 ? image : "https://placehold.co/160x160"}
+        unoptimized={image?.length === 0}
+        src={image?.length && image.length > 0 ? image : "https://placehold.co/160x160"}
         className="rounded-lg"
         alt="tovar"
         width={160}

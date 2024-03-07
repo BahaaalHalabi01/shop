@@ -10,7 +10,8 @@ export const products = sqliteTable("products", {
     sql`CURRENT_DATE`,
   ).notNull(),
   link: text("link").default(""),
-  image: blob("image").default(""),
+  image: blob("image").default("").$type<string>(),
 });
 
-export type Products = typeof products.$inferSelect
+export type TProduct = typeof products.$inferSelect
+export type TCreateProduct = typeof products.$inferInsert

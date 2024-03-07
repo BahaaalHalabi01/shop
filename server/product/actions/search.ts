@@ -1,4 +1,5 @@
 "use server";
+import { TProduct } from "@/lib/db_schema";
 import search_client, { SearchIndex } from "@/lib/search_client";
 
 export async function search_product(name: string) {
@@ -6,5 +7,5 @@ export async function search_product(name: string) {
     .index(SearchIndex.products)
     .search(name, { limit: 12 });
 
-  return data.hits;
+  return data.hits as Array<(typeof data.hits)[0] & TProduct>;
 }
