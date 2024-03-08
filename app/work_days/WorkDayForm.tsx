@@ -33,11 +33,11 @@ import {
   CommandLoading,
 } from "@/components/ui/command";
 import { create_sale } from "@/server/sales/actions/add";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 type TParams = {};
 
-export default function WorkDayForm({}: TParams) {
+export default function WorkDayForm({ }: TParams) {
   const params = useSearchParams();
   const date = params.get("date");
 
@@ -83,7 +83,7 @@ export default function WorkDayForm({}: TParams) {
         day: new Date(date),
       });
       alert(res)
-    } catch (err) {}
+    } catch (err) { }
 
     form.reset();
   }
@@ -177,7 +177,7 @@ export default function WorkDayForm({}: TParams) {
             control={form.control}
             name="amount"
             render={({ field: { onChange, ...r } }) => (
-              <FormItem className="max-w-fit">
+              <FormItem className="max-w-fit flex flex-col">
                 <FormLabel>Number of Items*</FormLabel>
                 <FormControl>
                   <Input
@@ -196,7 +196,7 @@ export default function WorkDayForm({}: TParams) {
             control={form.control}
             name="customer"
             render={({ field }) => (
-              <FormItem className="max-w-fit">
+              <FormItem className="max-w-fit flex flex-col">
                 <FormLabel>Name of the customer</FormLabel>
                 <FormControl>
                   <Input placeholder="Bahaa" type="text" {...field} />

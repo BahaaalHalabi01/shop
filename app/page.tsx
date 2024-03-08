@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 export default async function Home() {
   const data = await db.select().from(products).limit(12);
 
+  const x = await db.select().from(products).limit(12);
 
   return (
     <main className="flex flex-col items-center  px-24 pt-12 gap-y-10">

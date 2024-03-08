@@ -19,7 +19,7 @@ export async function addProduct(formData: FormData) {
   /**@todo handle error*/
   const safe = add_item_schema.parse(rawData);
 
-  const db_res = await db
+  await db
     .insert(products)
     .values({
       purchase_date: new Date(safe.purchase_date),
@@ -31,9 +31,9 @@ export async function addProduct(formData: FormData) {
     })
     .returning();
 
-  const res = await search_client
-    .index(SearchIndex.products)
-    .addDocuments(db_res);
+  // const res = await search_client
+  //   .index(SearchIndex.products)
+  //   .addDocuments(db_res);
 
   revalidatePath("/");
   redirect(`/`);

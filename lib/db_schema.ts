@@ -6,6 +6,7 @@ import {
   blob,
   primaryKey,
 } from "drizzle-orm/sqlite-core";
+import db from "./db";
 
 export const products = sqliteTable("products", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
@@ -41,7 +42,8 @@ export const salesToProducts = sqliteTable(
       .references(() => products.id),
     saleId: integer("sale_id")
       .notNull()
-      .references(() => sales.id),
+      .references(() => sales.id, { onDelete: "cascade" }),
+    saleDay: integer("day", { mode: "timestamp" }).notNull(),
   },
   (t) => ({
     pk: primaryKey(t.productId, t.saleId),
@@ -67,3 +69,8 @@ export type TCreateProduct = typeof products.$inferInsert;
 
 export type TSale = typeof sales.$inferSelect;
 export type TCreateSale = typeof sales.$inferInsert;
+
+export type TSaleProduct = typeof salesToProducts.$inferSelect & {
+  product: TProduct;
+  sale: TSale;
+};

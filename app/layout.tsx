@@ -16,7 +16,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const today = new Date().toISOString();
+  const today = new Date().toDateString();
   return (
     <html lang="en" className="dark">
       <body className={inter.className}>
@@ -28,7 +28,7 @@ export default async function RootLayout({
 
           <nav className="flex gap-x-6">
             <a href="/product/add">Add Product</a>
-            <a href={`/work_days?date=${encodeURIComponent(today)}`}>
+            <a href={`/work_days?date=${encodeURI(today)}`}>
               Work Days
             </a>
             <a href="#home">Home</a>
