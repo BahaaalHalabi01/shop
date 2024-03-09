@@ -29,6 +29,7 @@ function seed() {
           day: new Date(faker.date.between({
             from: new Date(2024, 2, 1),
             to: new Date(),
+
           }).toDateString()),
           amount: faker.number.int({ max: 50, min: 5 }),
           customer: faker.person.fullName(),

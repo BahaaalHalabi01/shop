@@ -1,10 +1,10 @@
 "use server";
 import db from "@/lib/db";
-import { eq, ilike, like, or } from "drizzle-orm";
+import { eq, like } from "drizzle-orm";
 import { TProduct, products } from "@/lib/db_schema";
 import search_client, { SearchIndex } from "@/lib/search_client";
 
-export async function search_product(value: string) {
+export async function search_product(value: string, limit = 8) {
   // const data = await search_client
   //   .index(SearchIndex.products)
   //   .search(name, { limit: 12 });
@@ -15,13 +15,13 @@ export async function search_product(value: string) {
   if (Number.parseInt(value)) {
     console.log(value);
     return db.query.products.findMany({
-      limit: 8,
+      limit,
       where: eq(products.price, Number(value)),
     });
   }
 
   return db.query.products.findMany({
-    limit: 8,
+    limit,
     ...(value.length > 0 && { where: like(products.name, `${value}%`) }),
   });
 }
