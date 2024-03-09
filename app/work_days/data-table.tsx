@@ -4,6 +4,7 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
+  getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 
@@ -15,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DataTablePagination } from "./data-table-pagination";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -28,7 +30,13 @@ export function DataTable<TData, TValue>({
   const table = useReactTable({
     data,
     columns,
+    getPaginationRowModel: getPaginationRowModel(),
     getCoreRowModel: getCoreRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: 5,
+      },
+    },
   });
 
   return (
@@ -80,6 +88,9 @@ export function DataTable<TData, TValue>({
           )}
         </TableBody>
       </Table>
+      <div className="flex items-center justify-end gap-x-2 py-4 pr-4">
+        <DataTablePagination table={table} />
+      </div>
     </div>
   );
 }

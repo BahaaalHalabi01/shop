@@ -14,8 +14,8 @@ type TPageParams = {
 export default async function WorkDays({
   searchParams: { date },
 }: TPageParams) {
+
   const product_sales = await db.query.salesToProducts.findMany({
-    limit: 8,
     with: {
       sale: true,
       product: true,
@@ -24,7 +24,7 @@ export default async function WorkDays({
   });
 
   return (
-    <main className="flex flex-col px-24 pt-8 gap-y-10">
+    <main className="flex flex-col px-24 py-8 gap-y-10">
       <h1 className="text-3xl">
         Products sold on the date of{" "}
         <span className="italic">
