@@ -13,7 +13,6 @@ export async function search_product(value: string, limit = 8) {
   //
 
   if (Number.parseInt(value)) {
-    console.log(value);
     return db.query.products.findMany({
       limit,
       where: eq(products.price, Number(value)),
