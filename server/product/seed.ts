@@ -16,16 +16,20 @@ function seed() {
     await db.transaction(async (tsx) => {
       const items = new Array(28).fill(0).map(createTovar);
 
-      await tsx.insert(products).values(items).returning();
+      const products_items = await tsx
+        .insert(products)
+        .values(items)
+        .returning();
 
       let sale_products: TCreateSale[] = [];
 
       new Array(50).fill(0).map((_) =>
         sale_products.push({
-          day: faker.date.between({
-            from: new Date(2024, 3, 4),
-            to: new Date(2024, 3, 12),
-          }),
+          //remove time
+          day: new Date(faker.date.between({
+            from: new Date(2024, 2, 1),
+            to: new Date(),
+          }).toDateString()),
           amount: faker.number.int({ max: 50, min: 5 }),
           customer: faker.person.fullName(),
         }),
@@ -36,7 +40,9 @@ function seed() {
       ).map((sale) => ({
         saleId: sale.id,
         saleDay: sale.day,
-        productId: faker.number.int({ min: 0, max: items.length }),
+        productId: products_items.at(
+          faker.number.int({ min: 0, max: items.length - 1 }),
+        )?.id!,
       }));
 
       await tsx.insert(salesToProducts).values(sales_products);
