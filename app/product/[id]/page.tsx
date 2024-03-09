@@ -1,8 +1,10 @@
 import db from "@/lib/db";
 import { eq } from "drizzle-orm";
-import { products } from "@/lib/db_schema";
+import { products, salesToProducts } from "@/lib/db_schema";
 import { format } from "date-fns";
 import Image from "next/image";
+import { DataTable } from "@/app/work_days/data-table";
+import { columns } from "@/app/work_days/columns";
 
 type TPageParams = {
   params: {
@@ -22,22 +24,35 @@ export default async function Page({ params }: TPageParams) {
       .where(eq(products.id, Number(params.id)))
   )[0];
 
+  const product_sales = await db.query.salesToProducts.findMany({
+    with: {
+      sale: true,
+      product: true,
+    },
+    where: eq(salesToProducts.productId, Number(params.id)),
+  });
+
   return (
     <main className="container lg:pt-12 pt-6">
       <h1 className="text-5xl text-center">{item?.name}</h1>
 
-      <div className="grid lg:grid-cols-4 gap-2 lg:pt-12 text-2xl place-items-start lg:place-items-center pt-4 md:grid-cols-3 grid-cols-1">
-        <span>In Stock: {item?.stock}</span>
+      <div className=" lg:pt-12 text-2xl pt-4 flex items-center gap-x-6">
+        <span className="border p-3 rounded-md">In Stock: {item?.stock}</span>
 
-        <span>
+        <span className="border p-3 rounded-md">
           Purhcase Date:{" "}
           {item?.purchase_date ? format(item?.purchase_date, "y/MM/dd") : "-"}
         </span>
-        <span>Price: {dollar_format.format(item?.price ?? 0)}</span>
+        <span className="border p-3 rounded-md">
+          Price: {dollar_format.format(item?.price ?? 0)}
+        </span>
 
-        <span>
+        <span className="border p-3 rounded-md">
           Link:
           {item?.link && <a href={item.link}>go to link</a>}
+        </span>
+        <span className="border p-3 rounded-md">
+          Total Sales: {product_sales.length}
         </span>
       </div>
       {!!item?.image && (
@@ -50,6 +65,10 @@ export default async function Page({ params }: TPageParams) {
           />
         </div>
       )}
+
+      <div className="pt-8">
+        <DataTable data={product_sales} columns={columns} />
+      </div>
     </main>
   );
 }

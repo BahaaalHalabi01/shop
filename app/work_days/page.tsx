@@ -11,6 +11,8 @@ type TPageParams = {
   searchParams: { date: string };
 };
 
+
+
 export default async function WorkDays({
   searchParams: { date },
 }: TPageParams) {

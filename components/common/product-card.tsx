@@ -4,18 +4,28 @@ import Image from "next/image";
 
 type TProps = TProduct & {};
 
+const dollar_format = new Intl.NumberFormat("en-US", {
+  currency: "USD",
+  style: "currency",
+});
+
 export default function ShopItem({
   name,
   id,
   stock,
   purchase_date,
+  price,
   image,
 }: TProps) {
   return (
-    <div className="rounded-lg flex gap-x-2 text-lg">
+    <div className="rounded-lg flex gap-x-2">
       <Image
         unoptimized={image?.length === 0}
-        src={image?.length && image.length > 0 ? image : "https://placehold.co/160x160"}
+        src={
+          image?.length && image.length > 0
+            ? image
+            : "https://placehold.co/160x160"
+        }
         className="rounded-lg"
         alt="tovar"
         width={160}
@@ -26,7 +36,8 @@ export default function ShopItem({
         <p>
           Current Stock: <span className="text-green-700 italic">{stock}</span>
         </p>
-        <p>Purchase Date: {format(new Date(purchase_date), "y/MM/dd")}</p>
+        <p>Price: {dollar_format.format(price)}</p>
+        <p>{format(new Date(purchase_date), "dd/MM/yy")}</p>
         <div className="pt-0.5" />
         <a href={`/product/${id}`} className="border p-2 max-w-fit rounded-md">
           {" "}
@@ -36,4 +47,3 @@ export default function ShopItem({
     </div>
   );
 }
-
