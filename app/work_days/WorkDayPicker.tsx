@@ -42,7 +42,7 @@ export default function WorkDayPicker() {
   function onSubmit(v: z.infer<typeof schema>) {
     const url = new URL(window.location.href);
 
-    url.searchParams.set("date", v.date.toISOString());
+    url.searchParams.set("date", String(v.date.getTime()));
 
     router.push(url.href);
   }

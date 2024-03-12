@@ -10,7 +10,11 @@ export const columns: ColumnDef<TSaleProduct>[] = [
   },
   {
     accessorKey: "product.price",
-    header: "Price",
+    header: "Price ($)",
+  },
+  {
+    accessorKey: "sale.sale_price",
+    header: "Sale Price ($)",
   },
   {
     accessorKey: "sale.amount",
@@ -19,5 +23,12 @@ export const columns: ColumnDef<TSaleProduct>[] = [
   {
     accessorKey: "sale.customer",
     header: "Customer",
+  },
+  {
+    id: "profit",
+    header: "Profit",
+    accessorFn: (row) => {
+      return Math.round((row.sale.sale_price / row.product.price) * 100)+"%";
+    },
   },
 ];
