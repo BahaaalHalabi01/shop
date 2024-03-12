@@ -14,7 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { debounce } from "lodash";
-import { ChangeEvent, useCallback, useState } from "react";
+import { useCallback, useState, useTransition } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { search_product } from "@/server/product/actions/search";
 import { CheckIcon, ChevronsUpDown, Loader } from "lucide-react";
@@ -37,9 +37,9 @@ import { useSearchParams } from "next/navigation";
 
 type TParams = {};
 
-export default function WorkDayForm({ }: TParams) {
+export default function WorkDayForm({}: TParams) {
   const params = useSearchParams();
-  const date = params.get("date");
+  const date = Number(params.get("date"));
 
   const schema = z.object({
     product: z.object({
@@ -47,6 +47,7 @@ export default function WorkDayForm({ }: TParams) {
       id: z.string(),
       price: z.number(),
     }),
+    sell_price: z.number(),
     amount: z.number(),
     customer: z.string().optional(),
   });
@@ -82,18 +83,19 @@ export default function WorkDayForm({ }: TParams) {
         productId: values.product.id,
         day: new Date(date),
       });
-      alert(res)
-    } catch (err) { }
 
-    form.reset();
+      if (res.success) return form.reset();
+
+      alert(res.message);
+    } catch (err) {}
   }
 
   if (!date) return null;
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-4 gap-x-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full">
+        <div className="grid lg:grid-cols-4 lg:gap-x-8 lg:gap-2 grid-cols-1 md:grid-cols-2 gap-y-5">
           <FormField
             control={form.control}
             name="product"
@@ -107,7 +109,7 @@ export default function WorkDayForm({ }: TParams) {
                         variant="outline"
                         role="combobox"
                         className={cn(
-                          "w-[200px] justify-between",
+                          "justify-between w-full",
                           !field.value && "text-muted-foreground",
                         )}
                       >
@@ -167,8 +169,28 @@ export default function WorkDayForm({ }: TParams) {
                     </Command>
                   </PopoverContent>
                 </Popover>
-
                 <FormDescription>The product id that was sold</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="sell_price"
+            render={({ field: { onChange, ...r } }) => (
+              <FormItem className="flex flex-col ">
+                <FormLabel>Selling Price ($)</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="40"
+                    type="number"
+                    {...r}
+                    onChange={(e) => onChange(Number(e.currentTarget.value))}
+                  />
+                </FormControl>
+                <FormDescription>
+                  The price that the item was sold at
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -177,7 +199,7 @@ export default function WorkDayForm({ }: TParams) {
             control={form.control}
             name="amount"
             render={({ field: { onChange, ...r } }) => (
-              <FormItem className="max-w-fit flex flex-col">
+              <FormItem className=" flex flex-col ">
                 <FormLabel>Number of Items*</FormLabel>
                 <FormControl>
                   <Input
@@ -196,7 +218,7 @@ export default function WorkDayForm({ }: TParams) {
             control={form.control}
             name="customer"
             render={({ field }) => (
-              <FormItem className="max-w-fit flex flex-col">
+              <FormItem className=" flex flex-col ">
                 <FormLabel>Name of the customer</FormLabel>
                 <FormControl>
                   <Input placeholder="Bahaa" type="text" {...field} />

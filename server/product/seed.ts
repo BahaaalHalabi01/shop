@@ -1,9 +1,19 @@
-import { TCreateSale, products, sales, salesToProducts } from "@/lib/db_schema";
+import { TCreateProduct, TCreateSale, products, sales, salesToProducts } from "@/lib/db_schema";
 import { faker } from "@faker-js/faker";
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
-import { createTovar } from "./mock";
 import search_client, { SearchIndex } from "@/lib/search_client";
+
+function createTovar(): TCreateProduct {
+  return {
+    stock: faker.number.int({ min: 10, max: 100 }),
+    name: faker.commerce.product(),
+    purchase_date: faker.date.past(),
+    price: Number(faker.commerce.price()),
+    image:'',
+    link:''
+  };
+}
 
 function seed() {
   const turso = createClient({
@@ -31,6 +41,7 @@ function seed() {
             to: new Date(),
 
           }).toDateString()),
+          sale_price:Number(faker.commerce.price()),
           amount: faker.number.int({ max: 50, min: 5 }),
           customer: faker.person.fullName(),
         }),

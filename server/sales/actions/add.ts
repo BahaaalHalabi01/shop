@@ -13,7 +13,14 @@ export async function create_sale(values: TCreateSale & { productId: string }) {
   )[0];
 
   if (!product) {
-    return false;
+    return { sucess: false };
+  }
+
+  if (product.stock < values.amount) {
+    return {
+      succes: false,
+      message: "Selling more items than there is in stock",
+    };
   }
 
   await db.transaction(async (tsx) => {
@@ -40,5 +47,5 @@ export async function create_sale(values: TCreateSale & { productId: string }) {
 
   revalidatePath("/work_days");
 
-  return true;
+  return { success: true };
 }

@@ -27,7 +27,7 @@ import { z } from "zod";
 
 export default function WorkDayPicker() {
   const params = useSearchParams();
-  const date = params.get("date");
+  const date = Number(params.get("date"));
 
   const router = useRouter();
   const schema = z.object({
@@ -36,7 +36,7 @@ export default function WorkDayPicker() {
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: { date: date ? new Date(date) : new Date() },
+    defaultValues: { date: !!date ? new Date(date) : new Date() },
   });
 
   function onSubmit(v: z.infer<typeof schema>) {

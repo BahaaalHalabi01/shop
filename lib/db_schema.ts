@@ -28,6 +28,7 @@ export const sales = sqliteTable("sales", {
   amount: integer("amount", { mode: "number" }).notNull(),
   customer: text("customer").default("").notNull(),
   day: integer("day", { mode: "timestamp" }).notNull(),
+  sale_price: integer("sale_price", { mode: "number" }).notNull().default(0),
 });
 
 export const salesRelations = relations(sales, ({ many }) => ({
@@ -46,7 +47,7 @@ export const salesToProducts = sqliteTable(
     saleDay: integer("day", { mode: "timestamp" }).notNull(),
   },
   (t) => ({
-    pk: primaryKey(t.productId, t.saleId),
+    pk: primaryKey({ columns: [t.productId, t.saleId] }),
   }),
 );
 
