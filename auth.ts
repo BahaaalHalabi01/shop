@@ -9,6 +9,8 @@ export const {
   unstable_update,
 } = NextAuth({
   session: { strategy: "jwt" },
+  debug: true,
+  secret: "gelloo",
   providers: [
     CredentialsProvider({
       name: "Sign in",
@@ -16,8 +18,21 @@ export const {
         username: { label: "Username" },
         password: { label: "Password", type: "password" },
       },
-      async authorize() {
-        const user = { id: "1", name: "Admin", email: "admin@admin.com" };
+      async authorize(credentials) {
+        const authResponse = await fetch("http://localhost:4000/api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(credentials),
+        });
+
+        if (!authResponse.ok) {
+          return null;
+        }
+
+        const user = await authResponse.json();
+
         return user;
       },
     }),

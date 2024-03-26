@@ -20,7 +20,6 @@ type TPageParams = {
   searchParams: { search?: string; page: string };
 };
 
-const size = 12;
 
 export default async function Home({ searchParams }: TPageParams) {
   const page = searchParams.page ? Number(searchParams.page) : 1;

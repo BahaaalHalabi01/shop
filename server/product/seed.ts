@@ -10,6 +10,12 @@ import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import search_client, { SearchIndex } from "@/lib/search_client";
 
+async function createUser(){
+
+
+
+}
+
 function createTovar(): TCreateProduct {
   return {
     stock: faker.number.int({ min: 50, max: 200 }),

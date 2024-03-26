@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Package } from "lucide-react";
 import Providers from "@/lib/providers";
+import { auth, signOut } from "@/auth";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,6 +18,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const today = new Date().getTime();
+  const sessio = await auth();
   return (
     <html lang="en" className="dark">
       <body className={inter.className}>
@@ -31,8 +33,15 @@ export default async function RootLayout({
             <a href={`/work_days?date=${encodeURI(String(today))}`}>
               Work Days
             </a>
-            {/* <a href="#home">Home</a> */}
-            {/* <a href="/api/auth/signin">Login</a> */}
+            <form
+              action={async () => {
+                "use server";
+                await signOut();
+              }}
+            >
+              <button>SignOut</button>
+              {/* <a href="/api/auth/signin">Login</a> */}
+            </form>
           </nav>
         </header>
         <Providers>{children}</Providers>
