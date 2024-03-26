@@ -4,7 +4,7 @@ import { add_item_schema } from "../schema";
 import { products } from "@/lib/db_schema";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import search_client, { SearchIndex } from "@/lib/search_client";
+import sharp from "sharp";
 
 export async function addProduct(formData: FormData) {
   const rawData = {
@@ -12,28 +12,31 @@ export async function addProduct(formData: FormData) {
     stock: Number(formData.get("stock")),
     price: Number(formData.get("price")),
     purchase_date: new Date(String(formData.get("purchase_date"))),
-    image: formData.get("image"),
+    image: formData.get("image") as File,
     link: !!formData.get("link") ? formData.get("link") : undefined,
   };
 
   /**@todo handle error*/
   const safe = add_item_schema.parse(rawData);
 
+  const prefix = "data:image/webp;base64,";
+  const buffer = await (safe.image as File).arrayBuffer();
+  const image = await sharp(buffer)
+    .resize({ width: 240, height: 240, fit: "fill" })
+    .webp()
+    .toBuffer();
+
   await db
     .insert(products)
     .values({
       purchase_date: new Date(safe.purchase_date),
       link: safe.link ?? "",
-      image: safe.image ?? "",
+      image: image ? prefix + image.toString("base64") : "",
       price: safe.price,
       stock: safe.stock,
       name: safe.name,
     })
     .returning();
-
-  // const res = await search_client
-  //   .index(SearchIndex.products)
-  //   .addDocuments(db_res);
 
   revalidatePath("/");
   redirect(`/`);

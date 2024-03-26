@@ -20,7 +20,6 @@ import { ChangeEvent, useRef } from "react";
 import { addProduct } from "@/server/product/actions/add";
 
 export const AddForm = () => {
-
   const form = useForm<z.infer<typeof add_item_schema>>({
     defaultValues: {
       name: "",
@@ -41,12 +40,7 @@ export const AddForm = () => {
 
       let v = values[key];
       if (!v) v = "";
-      form_data.set(
-        k,
-        key === "image" && image_blob.current
-          ? image_blob.current
-          : v.toString(),
-      );
+      form_data.set(k, key === "image" ? values.image : v.toString());
     }
 
     void addProduct(form_data);
@@ -69,9 +63,7 @@ export const AddForm = () => {
   }
 
   function displayImage(value: ChangeEvent<HTMLInputElement>) {
-    const file = value.currentTarget.files
-      ? value.currentTarget.files[0]
-      : null;
+    const file = value.target.files ? value.target.files[0] : null;
 
     if (!file) return;
 
@@ -193,18 +185,19 @@ export const AddForm = () => {
         <FormField
           control={form.control}
           name="image"
-          render={({ field: { onChange, ...r } }) => (
+          render={({ field: { onChange, value, ...r } }) => (
             <FormItem>
               <FormLabel>Image</FormLabel>
               <FormControl>
                 <Input
+                  {...r}
+                  value={value?.fileName}
                   placeholder="upload img to show"
                   type="file"
                   onChange={(e) => {
-                    onChange(e);
+                    onChange(e.target.files ? e.target.files[0] : null);
                     displayImage(e);
                   }}
-                  {...r}
                 />
               </FormControl>
               <FormDescription>
@@ -218,10 +211,11 @@ export const AddForm = () => {
         <div className="col-span-full pt-8 flex items-center justify-between">
           <div id="preview" className="invisible">
             <Image
-              src=""
+              src="/next.svg"
               width={240}
               height={240}
-              alt="preview image"
+              className="h-auto"
+              alt="preview image here"
               id="preview-image"
             />
           </div>

@@ -12,6 +12,8 @@ type TPageParams = {
   };
 };
 
+
+
 export default async function Page({ params }: TPageParams) {
   const dollar_format = new Intl.NumberFormat("en-US", {
     currency: "USD",
@@ -37,6 +39,15 @@ export default async function Page({ params }: TPageParams) {
       <h1 className="text-5xl text-center">{item?.name}</h1>
 
       <div className=" lg:pt-12 text-2xl pt-4 flex items-center gap-x-6">
+        {!!item?.image && (
+          <Image
+            width={80}
+            height={80}
+            alt="img"
+            src={item.image as string}
+            className="order-last"
+          />
+        )}
         <span className="border p-3 rounded-md">In Stock: {item?.stock}</span>
 
         <span className="border p-3 rounded-md">
@@ -55,16 +66,6 @@ export default async function Page({ params }: TPageParams) {
           Total Sales: {product_sales.length}
         </span>
       </div>
-      {!!item?.image && (
-        <div className="w-full flex items-end justify-end pt-60">
-          <Image
-            width={360}
-            height={360}
-            alt="img"
-            src={item.image as string}
-          />
-        </div>
-      )}
 
       <div className="pt-8">
         <DataTable data={product_sales} columns={columns} />

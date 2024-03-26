@@ -14,7 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { debounce } from "lodash";
-import { useCallback, useState, useTransition } from "react";
+import { useCallback, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { search_product } from "@/server/product/actions/search";
 import { CheckIcon, ChevronsUpDown, Loader } from "lucide-react";
@@ -43,12 +43,12 @@ export default function WorkDayForm({}: TParams) {
 
   const schema = z.object({
     product: z.object({
-      name: z.string().min(0),
-      id: z.string(),
+      name: z.string().min(1),
+      id: z.string().min(1),
       price: z.number(),
     }),
-    sell_price: z.number(),
-    amount: z.number(),
+    sale_price: z.coerce.number().gt(0),
+    amount: z.coerce.number().gt(0),
     customer: z.string().optional(),
   });
 
@@ -56,11 +56,17 @@ export default function WorkDayForm({}: TParams) {
 
   const { data, isLoading } = useQuery({
     queryKey: ["products", search],
-    queryFn: () => search_product(search),
+    queryFn: () => search_product(search, 16),
   });
+
+  const products = data?.data;
+  const hasNextPage = data?.hasNextPage;
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      customer: "",
+    },
   });
 
   const handleSearchChange = useCallback((value: string) => {
@@ -74,23 +80,35 @@ export default function WorkDayForm({}: TParams) {
     [],
   );
 
-  async function onSubmit(values: z.infer<typeof schema>) {
+  async function onSubmit(v: z.infer<typeof schema>) {
     if (!date) return;
     try {
-      const res = await create_sale({
-        amount: values.amount,
-        customer: values.customer,
-        productId: values.product.id,
+      const values: Parameters<typeof create_sale>[0] = {
+        sale_price: v.sale_price,
+        amount: v.amount,
+        customer: v.customer,
+        productId: v.product.id,
         day: new Date(date),
-      });
+      };
+
+      const res = await create_sale(values);
 
       if (res.success) return form.reset();
 
+      form.reset({
+        ...values,
+        product: v.product,
+      });
+
       alert(res.message);
-    } catch (err) {}
+    } catch (err) {
+      alert((err as Error).message);
+    }
   }
 
   if (!date) return null;
+
+  const product_error = form.formState.errors.product?.message;
 
   return (
     <Form {...form}>
@@ -140,25 +158,25 @@ export default function WorkDayForm({}: TParams) {
                             </div>
                           </CommandLoading>
                         )}
-                        {data &&
+                        {products &&
                           !isLoading &&
-                          data.map((product) => (
+                          products.map((p) => (
                             <CommandItem
-                              value={product.id + ""}
-                              key={product.id}
+                              value={p.products.id + ""}
+                              key={p.products.id}
                               onSelect={(v) =>
                                 field.onChange({
-                                  name: product.name,
+                                  name: p.products.name,
                                   id: v,
-                                  price: product.price,
+                                  price: p.products.price,
                                 })
                               }
                             >
-                              {product.name} ({product.price}$)
+                              {p.products.name} ({p.products.price}$)
                               <CheckIcon
                                 className={cn(
                                   "ml-auto h-4 w-4",
-                                  product.id + "" === field.value?.id
+                                  p.products.id + "" === field.value?.id
                                     ? "opacity-100"
                                     : "opacity-0",
                                 )}
@@ -170,23 +188,22 @@ export default function WorkDayForm({}: TParams) {
                   </PopoverContent>
                 </Popover>
                 <FormDescription>The product id that was sold</FormDescription>
-                <FormMessage />
+                {product_error && product_error.length > 0 && (
+                  <p className={"text-sm font-medium text-destructive"}>
+                    {"Product is required"}
+                  </p>
+                )}
               </FormItem>
             )}
           />
           <FormField
             control={form.control}
-            name="sell_price"
-            render={({ field: { onChange, ...r } }) => (
+            name="sale_price"
+            render={({ field }) => (
               <FormItem className="flex flex-col ">
                 <FormLabel>Selling Price ($)</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="40"
-                    type="number"
-                    {...r}
-                    onChange={(e) => onChange(Number(e.currentTarget.value))}
-                  />
+                  <Input placeholder="40" type="number" {...field} />
                 </FormControl>
                 <FormDescription>
                   The price that the item was sold at
@@ -198,16 +215,11 @@ export default function WorkDayForm({}: TParams) {
           <FormField
             control={form.control}
             name="amount"
-            render={({ field: { onChange, ...r } }) => (
+            render={({ field }) => (
               <FormItem className=" flex flex-col ">
                 <FormLabel>Number of Items*</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="20"
-                    type="number"
-                    {...r}
-                    onChange={(e) => onChange(Number(e.currentTarget.value))}
-                  />
+                  <Input placeholder="20" type="number" {...field} />
                 </FormControl>
                 <FormDescription>Number that was sold</FormDescription>
                 <FormMessage />

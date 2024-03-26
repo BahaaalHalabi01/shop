@@ -19,7 +19,7 @@ export async function create_sale(values: TCreateSale & { productId: string }) {
   if (product.stock < values.amount) {
     return {
       succes: false,
-      message: "Selling more items than there is in stock",
+      message: `Only (${product.stock}) in stock.Selling more items than there is.`,
     };
   }
 
@@ -30,6 +30,7 @@ export async function create_sale(values: TCreateSale & { productId: string }) {
         customer: values.customer,
         amount: values.amount,
         day: values.day,
+        sale_price:values.sale_price
       })
       .returning({ id: sales.id, day: sales.day, amount: sales.amount });
 
@@ -37,6 +38,8 @@ export async function create_sale(values: TCreateSale & { productId: string }) {
       saleId: item.id,
       productId: Number(values.productId),
       saleDay: item.day,
+
+
     });
 
     const new_stock = product.stock - item.amount;

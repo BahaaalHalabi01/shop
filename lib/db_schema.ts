@@ -6,7 +6,6 @@ import {
   blob,
   primaryKey,
 } from "drizzle-orm/sqlite-core";
-import db from "./db";
 
 export const products = sqliteTable("products", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
@@ -28,7 +27,7 @@ export const sales = sqliteTable("sales", {
   amount: integer("amount", { mode: "number" }).notNull(),
   customer: text("customer").default("").notNull(),
   day: integer("day", { mode: "timestamp" }).notNull(),
-  sale_price: integer("sale_price", { mode: "number" }).notNull().default(0),
+  sale_price: integer("sale_price", { mode: "number" }).notNull(),
 });
 
 export const salesRelations = relations(sales, ({ many }) => ({

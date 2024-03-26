@@ -31,8 +31,8 @@ export default async function RootLayout({
             <a href={`/work_days?date=${encodeURI(String(today))}`}>
               Work Days
             </a>
-            <a href="#home">Home</a>
-            <a href="/api/auth/signin">Login</a>
+            {/* <a href="#home">Home</a> */}
+            {/* <a href="/api/auth/signin">Login</a> */}
           </nav>
         </header>
         <Providers>{children}</Providers>

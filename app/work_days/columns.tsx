@@ -28,7 +28,12 @@ export const columns: ColumnDef<TSaleProduct>[] = [
     id: "profit",
     header: "Profit",
     accessorFn: (row) => {
-      return Math.round((row.sale.sale_price / row.product.price) * 100)+"%";
+      const percent =  Math.round((row.sale.sale_price / row.product.price) * 100);
+
+      if(percent < 100 ) {
+        return `-${100-percent}%`
+      }
+      return `+${percent}%`
     },
   },
 ];
