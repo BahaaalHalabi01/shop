@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "db:push": "pnpm drizzle-kit push:sqlite",
+    "db:migrate": "pnpm drizzle-kit generate:sqlite",
     "db:studio": "pnpm drizzle-kit studio",
     "db:dev": "turso dev --db-file local.db"
   },
@@ -43,11 +44,13 @@
   "devDependencies": {
     "@faker-js/faker": "^8.4.1",
     "@tanstack/eslint-plugin-query": "^5.20.1",
+    "@types/bcrypt": "^5.0.2",
     "@types/lodash": "^4.14.202",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
+    "bcrypt": "^5.1.1",
     "drizzle-kit": "^0.20.14",
     "eslint": "^8",
     "eslint-config-next": "14.1.2",

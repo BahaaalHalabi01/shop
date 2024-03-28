@@ -14,10 +14,8 @@ export const users = sqliteTable("user", {
   email: text("email").notNull(),
   emailVerified: integer("emailVerified", { mode: "timestamp" }),
   image: text("image"),
+  password: text("password").notNull(),
 });
-
-
-
 
 export const accounts = sqliteTable(
   "account",
@@ -50,18 +48,6 @@ export const sessions = sqliteTable("session", {
     .references(() => users.id, { onDelete: "cascade" }),
   expires: integer("expires", { mode: "timestamp" }).notNull(),
 });
-
-export const verificationTokens = sqliteTable(
-  "verificationToken",
-  {
-    identifier: text("identifier").notNull(),
-    token: text("token").notNull(),
-    expires: integer("expires", { mode: "timestamp" }).notNull(),
-  },
-  (vt) => ({
-    compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
-  }),
-);
 
 export const products = sqliteTable("products", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),

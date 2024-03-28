@@ -15,6 +15,7 @@ import {
 import { search_product } from "@/server/product/actions/search";
 import { Search } from "lucide-react";
 import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 
 type TPageParams = {
   searchParams: { search?: string; page: string };
@@ -22,6 +23,9 @@ type TPageParams = {
 
 
 export default async function Home({ searchParams }: TPageParams) {
+
+  const user = await auth()
+
   const page = searchParams.page ? Number(searchParams.page) : 1;
   const { data, hasNextPage } = await search_product(
     searchParams.search ?? "",

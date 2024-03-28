@@ -8,13 +8,7 @@ import {
 import { faker } from "@faker-js/faker";
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
-import search_client, { SearchIndex } from "@/lib/search_client";
 
-async function createUser(){
-
-
-
-}
 
 function createTovar(): TCreateProduct {
   return {

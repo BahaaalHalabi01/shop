@@ -9,8 +9,13 @@ export const {
   unstable_update,
 } = NextAuth({
   session: { strategy: "jwt" },
-  debug: true,
-  secret: "gelloo",
+  secret: "hello",
+  callbacks: {
+    async session({ session, token }) {
+      session.userId = token.sub!;
+      return session;
+    },
+  },
   providers: [
     CredentialsProvider({
       name: "Sign in",
